@@ -49,6 +49,85 @@ namespace FormulaTestCases
         }
 
         /// <summary>
+        /// Another syntax error.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct4()
+        {
+            Formula f = new Formula("(2+3))");
+        }
+
+        /// <summary>
+        /// Another syntax error.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct5()
+        {
+            Formula f = new Formula("((2/3)");
+        }
+
+        /// <summary>
+        /// Another syntax error.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct6()
+        {
+            Formula f = new Formula("()2*3");
+        }
+
+        /// <summary>
+        /// Another syntax error.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct7()
+        {
+            Formula f = new Formula("2m +* 3");
+        }
+
+        /// <summary>
+        /// Another syntax error.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct8()
+        {
+            Formula f = new Formula("(+25 + 7)");
+        }
+
+        /// <summary>
+        /// Another syntax error.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct9()
+        {
+            Formula f = new Formula("2m $ 3");
+        }
+
+        /// <summary>
+        /// Another syntax error.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct10()
+        {
+            Formula f = new Formula("2m + 3(");
+        }
+
+        /// <summary>
+        /// Another syntax error.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void Construct11()
+        {
+            Formula f = new Formula("(x(x + 3)");
+        }
+        /// <summary>
         /// Makes sure that "2+3" evaluates to 5.  Since the Formula
         /// contains no variables, the delegate passed in as the
         /// parameter doesn't matter.  We are passing in one that
