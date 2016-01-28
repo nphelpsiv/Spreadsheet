@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 namespace Formulas
 {
     /// <summary>
-    /// Represents formulas written in standard infix notation using standard precedence
+    /// Represents formulas written in standard infixC:\Program Files\Development Game Projects\CS3500\Repos\Spreadsheet\Spreadsheet\Formula\Formula.cs notation using standard precedence
     /// rules.  Provides a means to evaluate Formulas.  Formulas can be composed of
     /// non-negative floating-point numbers, variables, left and right parentheses, and
     /// the four binary operator symbols +, -, *, and /.  (The unary operators + and -
@@ -41,6 +41,104 @@ namespace Formulas
         /// </summary>
         public Formula(String formula)
         {
+            int count = 0;
+            int countlp = 0;
+            int countrp = 0;
+            bool isDorVARorRP = false;
+            IEnumerable<String> tokens = GetTokens(formula);
+            foreach (String token in tokens)
+            {
+                bool isVar = false;
+                bool isOper = false;
+                bool islp = false;
+                bool isrp = false;
+                bool isDouble = false;
+                double n;
+                if (count == 0 && token.Equals(""))
+                {
+                    throw new FormulaFormatException("Formula must have at least one token");
+                }
+                if (Regex.IsMatch(token, @"[a-zA-Z][0-9a-zA-Z]*"))
+                {
+                    if (isDorVARorRP == true)
+                    {
+                        throw new FormulaFormatException("Any token that immediately follows a number, a variable, or a closing parenthesis must be either an operator or a closing parenthesis.");
+                    }
+                    isVar = true;
+                    isDorVARorRP = true;
+                    count++;
+                }
+                else if (Regex.IsMatch(token, @"[\+\-*/]"))
+                {
+                    if (isDorVARorRP == false)
+                    {
+                        throw new FormulaFormatException("Any token that immediately follows an opening parenthesis or an operator must be either a number, a variable, or an opening parenthesis.");
+                    }
+                    isOper = true;
+                    isDorVARorRP = false;
+                    count++;
+                }
+                else if (Regex.IsMatch(token, @"^[(]+$"))
+                {
+                    if (isDorVARorRP == true)
+                    {
+                        throw new FormulaFormatException("Any token that immediately follows a number, a variable, or a closing parenthesis must be either an operator or a closing parenthesis.");
+                    }
+                    islp = true;
+                    isDorVARorRP = false;
+                    count++;
+                    countlp++;
+                }
+                else if (Regex.IsMatch(token, @"^[)]+$"))
+                {
+                    if (isDorVARorRP == false)
+                    {
+                        throw new FormulaFormatException("Any token that immediately follows an opening parenthesis or an operator must be either a number, a variable, or an opening parenthesis.");
+                    }
+                    isrp = true;
+                    isDorVARorRP = true;
+                    count++;
+                    countrp++;
+                    if(countrp > countlp)
+                    {
+                        throw new FormulaFormatException("Too many close paranthesis");
+                    }
+                }
+                else if (Double.TryParse(token, out n))
+                {
+                    if (isDorVARorRP == true)
+                    {
+                        throw new FormulaFormatException("Any token that immediately follows a number, a variable, or a closing parenthesis must be either an operator or a closing parenthesis.");
+                    }
+                    isDouble = true;
+                    isDorVARorRP = true;
+                    count++;
+                }
+                else
+                {
+                    throw new FormulaFormatException("There is a character that is not valid");
+                }
+                if(count == 1 && !(islp || isDouble || isVar))
+                {
+                    throw new FormulaFormatException("The first token of a formula must be a number, a variable, or an opening parenthesis.");
+                }
+                if (count == formula.Length)
+                {
+                    if (!(isrp || isDouble || isVar))
+                    {
+                        throw new FormulaFormatException("The last token of a formula must be a number, a variable, or a closing parenthesis.");
+                    }
+                    if(countlp != countrp)
+                    {
+                        throw new FormulaFormatException("The total number of opening parentheses must equal the total number of closing parentheses.");
+                    }
+                }
+                if (count > 1 && isDorVARorRP == true)
+                {
+
+                }
+
+            }
         }
         /// <summary>
         /// Evaluates this Formula, using the Lookup delegate to determine the values of variables.  (The
