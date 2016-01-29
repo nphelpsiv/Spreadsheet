@@ -1,6 +1,7 @@
-﻿// Skeleton written by Joe Zachary for CS 3500, January 2015
+﻿// Skeleton and some comments written by Joe Zachary for CS 3500, January 2015
 // Revised by Joe Zachary, January 2016
 // JLZ Repaired pair of mistakes, January 23, 2016
+//Formula and Evaluate Methods completed and filled by Neal Phelps U0669056 CS 3500, Jan. 2016
 
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace Formulas
     /// </summary>
     public class Formula
     {
+        private IEnumerable<String> tokens;
         /// <summary>
         /// Creates a Formula from a string that consists of a standard infix expression composed
         /// from non-negative floating-point numbers (using C#-like syntax for double/int literals), 
@@ -41,23 +43,27 @@ namespace Formulas
         /// </summary>
         public Formula(String formula)
         {
+            //set variables that should not be reset with each new token
             int count = 0;
             int countlp = 0;
             int countrp = 0;
             bool isDorVARorRP = false;
-            IEnumerable<String> tokens = GetTokens(formula);
+            tokens = GetTokens(formula);
+            //Check if there is at least one token, and is not null
+            if (formula == null ||formula.Equals("") || tokens.Count() == 0)
+            {
+                throw new FormulaFormatException("Formula must have at least one token");
+            }
             foreach (String token in tokens)
             {
+                //set and reset variables for each new token in tokens
                 bool isVar = false;
                 bool isOper = false;
                 bool islp = false;
                 bool isrp = false;
                 bool isDouble = false;
                 double n;
-                if (count == 0 && token.Equals(""))
-                {
-                    throw new FormulaFormatException("Formula must have at least one token");
-                }
+                //Do checks to see what type the token is and set booleans accordingly
                 if (Regex.IsMatch(token, @"[a-zA-Z][0-9a-zA-Z]*"))
                 {
                     if (isDorVARorRP == true)
@@ -99,11 +105,13 @@ namespace Formulas
                     isDorVARorRP = true;
                     count++;
                     countrp++;
+                    //Check if we have too many right parenthesis
                     if(countrp > countlp)
                     {
                         throw new FormulaFormatException("Too many close paranthesis");
                     }
                 }
+                //Check if it's a double, if so store in n
                 else if (Double.TryParse(token, out n))
                 {
                     if (isDorVARorRP == true)
@@ -114,30 +122,29 @@ namespace Formulas
                     isDorVARorRP = true;
                     count++;
                 }
+                //If its not one of the valid types throw the exception
                 else
                 {
                     throw new FormulaFormatException("There is a character that is not valid");
                 }
-                if(count == 1 && !(islp || isDouble || isVar))
+                //Check if first variable is valid
+                if(count == 0 && !(islp || isDouble || isVar))
                 {
                     throw new FormulaFormatException("The first token of a formula must be a number, a variable, or an opening parenthesis.");
                 }
+                //If we are on the last one check if its the incorrect token
                 if (count == formula.Length)
                 {
                     if (!(isrp || isDouble || isVar))
                     {
                         throw new FormulaFormatException("The last token of a formula must be a number, a variable, or a closing parenthesis.");
                     }
+                    //Check if paranthesis are equal at end
                     if(countlp != countrp)
                     {
                         throw new FormulaFormatException("The total number of opening parentheses must equal the total number of closing parentheses.");
                     }
                 }
-                if (count > 1 && isDorVARorRP == true)
-                {
-
-                }
-
             }
         }
         /// <summary>
@@ -151,7 +158,201 @@ namespace Formulas
         /// </summary>
         public double Evaluate(Lookup lookup)
         {
-            return 0;
+            //Create stacks and final result
+            Stack<String> strStack = new Stack<String>();
+            Stack<Double> dStack = new Stack<Double>();
+            Double result = 0;
+            foreach (String token in tokens)
+            {
+                //Create variables that reset after each new token
+                bool isVar = false;
+                bool isOper = false;
+                bool islp = false;
+                bool isrp = false;
+                bool isDouble = false;
+                double d = 0;
+                //make checks to see what type the token is
+                if (Regex.IsMatch(token, @"[a-zA-Z][0-9a-zA-Z]*"))
+                {
+                    isVar = true;
+
+                }
+                else if (Regex.IsMatch(token, @"[\+\-*/]"))
+                {
+
+                    isOper = true;
+
+                }
+                else if (Regex.IsMatch(token, @"^[(]+$"))
+                {
+                    islp = true;
+                }
+                else if (Regex.IsMatch(token, @"^[)]+$"))
+                {
+                    isrp = true;
+                }
+                //Check if it is a double, if so store in d
+                else if (Double.TryParse(token, out d))
+                {
+                    isDouble = true;
+                }
+                //if it is a variable call lookup method to see if it correlates to value, store in that double value, otherwise throw exception
+                if (isVar)
+                {
+                    try
+                    {
+                        d = lookup(token);
+                        isDouble = true;
+                    }
+                    catch(UndefinedVariableException e)
+                    {
+                        throw new FormulaEvaluationException(token + " is not a defined variable.");
+                    }
+                }
+                //If * or / is at the top of the operator stack, pop the value stack, pop the operator stack, 
+                //and apply the popped operator to t and the popped number. Push the result onto the value stack. 
+                // Otherwise, push t onto the value stack
+                //Any variable has already been converted to double at this point and will work accordingly
+                if (isDouble)
+                {
+                    if(strStack.Count != 0 && (strStack.Peek().Equals("*") || (strStack.Peek().Equals("/")))){
+                        Double temp;
+                        String strOper = strStack.Pop();
+                        Double value = dStack.Pop();
+                        if (strOper.Equals("*"))
+                        {
+                            temp = d * value;
+                        }
+                        else
+                        {
+                            if(d != 0)
+                            {
+                                temp = value / d;
+                            }
+                            else
+                            {
+                                throw new FormulaEvaluationException("Cannot divide by zero");
+                            }
+                        }
+                        dStack.Push(temp);
+                    }
+                    else
+                    {
+                        dStack.Push(d);
+                    }
+                }
+                //Check if operator
+                else if (isOper)
+                {
+                    //If + or - is at the top of the operator stack, pop the value stack twice and the operator stack once.  
+                    //Apply the popped operator to the popped numbers. Push the result onto the value stack.
+                    //Whether or not you did the first step, push t onto the operator stack
+                    if (token.Equals("+") || token.Equals("-"))
+                    {
+                        if(strStack.Count != 0 && (strStack.Peek().Equals("+") || strStack.Peek().Equals("-")))
+                        {
+                            Double value1 = dStack.Pop();
+                            Double value2 = dStack.Pop();
+                            String oper = strStack.Pop();
+                            Double temp;
+                            if (oper.Equals("+"))
+                            {
+                                temp = value1 + value2;
+                            }
+                            else
+                            {
+                                temp = value2 - value1;
+                            }
+                            dStack.Push(temp);
+                        }
+                        strStack.Push(token);
+                    }
+                    //If operator is * or / Push t onto the operator stack
+                    else if (token.Equals("*") || token.Equals("/"))
+                    {
+                        strStack.Push(token);
+                    }
+                }
+                //If left paranthesis push on stack
+                else if (islp)
+                {
+                    strStack.Push(token);
+                }
+                //If + or - is at the top of the operator stack, pop the value stack twice and the operator stack once. 
+                //Apply the popped operator to the popped numbers. Push the result onto the value stack.
+                //Whether or not you did the first step, the top of the operator stack will be a (.Pop it.
+                //After you have completed the previous step, if *or / is at the top of the operator stack, 
+                //pop the value stack twice and the operator stack once. Apply the popped operator to the popped numbers. 
+                //Push the result onto the value stack.
+                else if (isrp)
+                {
+
+                    if (strStack.Count != 0 && (strStack.Peek().Equals("+") || strStack.Peek().Equals("-")))
+                    {
+                        Double value1 = dStack.Pop();
+                        Double value2 = dStack.Pop();
+                        String oper = strStack.Pop();
+                        Double temp;
+                        if (oper.Equals("+"))
+                        {
+                            temp = value1 + value2;
+                        }
+                        else
+                        {
+                            temp = value2 - value1;
+                        }
+                        dStack.Push(temp);
+                    }
+                    String rp = strStack.Pop();
+                    if (strStack.Count != 0 && (strStack.Peek().Equals("*") || strStack.Peek().Equals("/")))
+                    {
+                        Double value1 = dStack.Pop();
+                        Double value2 = dStack.Pop();
+                        String oper = strStack.Pop();
+                        Double temp;
+                        if (oper.Equals("*"))
+                        {
+                            temp = value1 * value2;
+                        }
+                        else
+                        {
+                            if(value1 != 0)
+                            {
+                                temp = value2 / value1;
+                            }
+                            else
+                            {
+                                throw new FormulaEvaluationException("Cannot divide by zero");
+                            }
+                        }
+                        dStack.Push(temp);
+                    }
+                }
+                
+            }
+            //If operator stack is empty: Value stack will contain a single number.  Pop it and report as the value of the expression
+            if (strStack.Count == 0)
+            {
+                result = dStack.Pop();
+            }
+            //Otherwise: There will be exactly one operator on the operator stack, and it will be either + or -. 
+            //There will be exactly two values on the value stack. 
+            //Apply the operator to the two values and report the result as the value of the expression.
+            else
+            {
+                Double value1 = dStack.Pop();
+                Double value2 = dStack.Pop();
+                String oper = strStack.Pop();
+                if (oper.Equals("+"))
+                {
+                    result = value1 + value2;
+                }
+                else if (oper.Equals("-"))
+                {
+                    result = value2 - value1;
+                }
+            }
+            return result;
         }
 
         /// <summary>
