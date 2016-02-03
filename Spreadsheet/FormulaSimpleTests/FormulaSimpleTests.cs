@@ -1,7 +1,7 @@
 ﻿// Written by Joe Zachary for CS 3500, January 2016.
-// Reapired error in Evaluate5.  Added TestMethod Attribute
+// Repaired error in Evaluate5.  Added TestMethod Attribute
 //    for Evaluate4 and Evaluate5 - JLZ January 25, 2016
-//Evaluate 6 - 10 and and Constructs 6- 16 by Neal Phelps U0669056 CS 3500 Jan. 2016
+// Corrected comment for Evaluate3 - JLZ January 29, 2016
 
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -50,135 +50,6 @@ namespace FormulaTestCases
         }
 
         /// <summary>
-        /// Another syntax error.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void Construct4()
-        {
-            Formula f = new Formula("(2+3))");
-        }
-
-        /// <summary>
-        /// Another syntax error.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void Construct5()
-        {
-            Formula f = new Formula("((2/3)");
-        }
-
-        /// <summary>
-        /// Another syntax error.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void Construct6()
-        {
-            Formula f = new Formula("()2*3");
-        }
-
-        /// <summary>
-        /// Another syntax error.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void Construct7()
-        {
-            Formula f = new Formula("2m +* 3");
-        }
-
-        /// <summary>
-        /// Another syntax error.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void Construct8()
-        {
-            Formula f = new Formula("(+25 + 7)");
-        }
-
-        /// <summary>
-        /// Another syntax error.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void Construct9()
-        {
-            Formula f = new Formula("2m $ 3");
-        }
-
-        /// <summary>
-        /// Another syntax error.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void Construct10()
-        {
-            Formula f = new Formula("2m + 3(");
-        }
-
-        /// <summary>
-        /// Another syntax error.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void Construct11()
-        {
-            Formula f = new Formula("(x(x + 3)");
-        }
-
-        /// <summary>
-        /// Another syntax error.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void Construct12()
-        {
-            Formula f = new Formula("");
-        }
-
-        /// <summary>
-        /// Another syntax error.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void Construct13()
-        {
-            Formula f = new Formula("               ");
-        }
-
-        /// <summary>
-        /// Another syntax error.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void Construct14()
-        {
-            Formula f = new Formula("$%^");
-        }
-
-        /// <summary>
-        /// Another syntax error.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void Construct15()
-        {
-            Formula f = new Formula("$ (5 + 6)");
-        }
-
-        /// <summary>
-        /// Another syntax error.
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void Construct16()
-        {
-            Formula f = new Formula(null);
-        }
-        /// <summary>
         /// Makes sure that "2+3" evaluates to 5.  Since the Formula
         /// contains no variables, the delegate passed in as the
         /// parameter doesn't matter.  We are passing in one that
@@ -206,7 +77,7 @@ namespace FormulaTestCases
 
         /// <summary>
         /// Here, the delegate passed to Evaluate always throws a
-        /// FormulaEvaluationException (meaning that no variables have
+        /// UndefinedVariableException (meaning that no variables have
         /// values).  The test case checks that the result of
         /// evaluating the Formula is a FormulaEvaluationException.
         /// </summary>
@@ -239,57 +110,6 @@ namespace FormulaTestCases
             Assert.AreEqual(f.Evaluate(Lookup4), 20.0, 1e-6);
         }
 
-        /// <summary>
-        /// Divide by zero
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaEvaluationException))]
-        public void Evaluate6()
-        {
-            Formula f = new Formula("(x + y) * (z / 0) * 1.0");
-            Assert.AreEqual(f.Evaluate(Lookup4), 20.0, 1e-6);
-        }
-
-        /// <summary>
-        /// Bad variable
-        /// </summary>
-        [TestMethod]
-        [ExpectedException(typeof(FormulaEvaluationException))]
-        public void Evaluate7()
-        {
-            Formula f = new Formula("(x + y) * (l / x) * 1.0");
-            Assert.AreEqual(f.Evaluate(Lookup4), 20.0, 1e-6);
-        }
-
-        /// <summary>
-        /// This uses one of each kind of token.
-        /// </summary>
-        [TestMethod]
-        public void Evaluate8()
-        {
-            Formula f = new Formula("((x + y) * (z / x)) * (x * z) + ((5 + 13)/2)");
-            Assert.AreEqual(f.Evaluate(Lookup4), 649.0, 1e-6);
-        }
-
-        /// <summary>
-        /// This uses one of each kind of token.
-        /// </summary>
-        [TestMethod]
-        public void Evaluate9()
-        {
-            Formula f = new Formula("1/x");
-            Assert.AreEqual(f.Evaluate(Lookup4), .25, 1e-6);
-        }
-
-        /// <summary>
-        /// This uses one of each kind of token.
-        /// </summary>
-        [TestMethod]
-        public void Evaluate10()
-        {
-            Formula f = new Formula("10 + x + (x + x) * (z / x) * 5 + 6 + x - y");
-            Assert.AreEqual(f.Evaluate(Lookup4), 98.0, 1e-6);
-        }
         /// <summary>
         /// A Lookup method that maps x to 4.0, y to 6.0, and z to 8.0.
         /// All other variables result in an UndefinedVariableException.
