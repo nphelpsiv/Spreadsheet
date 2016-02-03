@@ -277,8 +277,8 @@ namespace FormulaTestCases
         [TestMethod]
         public void Evaluate9()
         {
-            Formula f = new Formula("5.0 * 1.0");
-            Assert.AreEqual(f.Evaluate(Lookup4), 5.0, 1e-6);
+            Formula f = new Formula("1/x");
+            Assert.AreEqual(f.Evaluate(Lookup4), .25, 1e-6);
         }
 
         /// <summary>
