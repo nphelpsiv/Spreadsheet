@@ -1,5 +1,6 @@
 ﻿// Skeleton implementation written by Joe Zachary for CS 3500, January 2015.
 // Revised for CS 3500 by Joe Zachary, January 29, 2016
+//Revised by Neal Phelps 2/4/2016 U0669056 for CS 3500
 
 using System;
 using System.Collections.Generic;
@@ -49,11 +50,16 @@ namespace Dependencies
     /// </summary>
     public class DependencyGraph
     {
+        //member variables for size and the new dictionary
+        private int size;
+        private Dictionary<String, HashSet<String>> dictionary;
         /// <summary>
         /// Creates a DependencyGraph containing no dependencies.
         /// </summary>
         public DependencyGraph()
         {
+            dictionary = new Dictionary<string, HashSet<string>>();
+            size = 0;
         }
 
         /// <summary>
@@ -61,7 +67,7 @@ namespace Dependencies
         /// </summary>
         public int Size
         {
-            get { return 0; }
+            get { return size; }
         }
 
         /// <summary>
@@ -69,6 +75,10 @@ namespace Dependencies
         /// </summary>
         public bool HasDependents(string s)
         {
+            if (dictionary.ContainsKey(s))
+            {
+                return true;
+            }
             return false;
         }
 
@@ -77,6 +87,13 @@ namespace Dependencies
         /// </summary>
         public bool HasDependees(string s)
         {
+            foreach (HashSet<String> set in dictionary.Values)
+            {
+                if (set.Contains(s))
+                {
+                    return true;
+                }
+            }
             return false;
         }
 
@@ -85,7 +102,9 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
-            return null;
+            //get values
+            var values = dictionary[s];
+            return values;
         }
 
         /// <summary>
@@ -93,7 +112,16 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
-            return null;
+            List<String> list = new List<String>();
+            //get keys
+            foreach(KeyValuePair<String, HashSet<String>> p in dictionary)
+            {
+                if (p.Value.Contains(s))
+                {
+                    list.Add(p.Key);
+                }
+            }
+            return list;
         }
 
         /// <summary>
@@ -103,8 +131,24 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
+            if (dictionary.ContainsKey(s))
+            {
+                var values = dictionary[s];
+                if (values.Contains(t))
+                {
+                    return;
+                }
+                values.Add(t);
+                size++;
+            }
+            else
+            {
+                HashSet<String> newSet = new HashSet<String>();
+                newSet.Add(t);
+                dictionary.Add(s, newSet);
+                size++;
+            }
         }
-
         /// <summary>
         /// Removes the dependency (s,t) from this DependencyGraph.
         /// Does nothing if (s,t) doesn't belong to this DependencyGraph.
@@ -112,6 +156,29 @@ namespace Dependencies
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
+            if (dictionary.ContainsKey(s))
+            {
+                var values = dictionary[s];
+                if(values.Count == 1 && values.Contains(t))
+                {
+                    dictionary.Remove(s);
+                    size--;
+                }
+                else
+                {
+                    HashSet<String> temp = new HashSet<string>();
+                    foreach(String str in values)
+                    {
+                        if(str != t)
+                        {
+                            temp.Add(str);
+                        }
+                    }
+                    dictionary.Remove(s);
+                    dictionary.Add(s, temp);
+                    size--;
+                }
+            }
         }
 
         /// <summary>
@@ -121,6 +188,16 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            HashSet<String> temp = new HashSet<string>(); ;
+            if (dictionary.ContainsKey(s))
+            {
+                dictionary.Remove(s);
+                foreach (String str in newDependents)
+                {
+                    temp.Add(str);
+                }
+                dictionary.Add(s, temp);
+            }
         }
 
         /// <summary>
@@ -130,6 +207,20 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
+            //transfer newDependees to liest
+            List<String> list = new List<string>();
+            foreach(String str in dictionary.Keys)
+            {
+                list.Add(str);
+            }
+            foreach(String str in list)
+            {
+                RemoveDependency(str, t);
+            }
+            foreach(String str in newDependees)
+            {
+                AddDependency(str, t);
+            }
         }
     }
 }
