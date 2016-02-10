@@ -1,0 +1,14 @@
+Hey Amit thank you for your comments and help. I am happy to note
+that I was able to pass all of the test by making 2 simple corrections.
+The first and most significant problem I was having was in the GetDependents
+method. As you know, I have just one dictionary, which at first was a little confusing
+to me and so I forgot to account for if the passed in string, or "s" was null or didn't
+exist in the dictionary as a dependee. If it wasn't there, I still made a check
+for it that threw an exception. To fix this, I surrounded the check with a try,
+catch, and they returned an empty IEnumerable if it wasn't present. That fixed the
+problem and allowed me to pass all tests except for one.
+The second issue was that I wasn't passing the test NonEmptyTest16. I wasn't returning
+the correct size. This was because I forgot to increment size in both replace methods.
+I simply added the increments, and now I pass all tests. Future issues can be avoided
+by adding more test cases on my end, especially corner cases. Thank you for regrading this
+project. 
