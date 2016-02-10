@@ -102,9 +102,18 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
-            //get values
-            var values = dictionary[s];
-            return values;
+            HashSet<String> dependents = new HashSet<string>();
+            //CHANGE
+            try
+            {
+                dependents = dictionary[s];
+                return dependents;
+            }
+            catch(KeyNotFoundException e)
+            {
+
+            }
+            return dependents;
         }
 
         /// <summary>
@@ -197,6 +206,7 @@ namespace Dependencies
                     temp.Add(str);
                 }
                 dictionary.Add(s, temp);
+                size++;
             }
         }
 
@@ -220,6 +230,7 @@ namespace Dependencies
             foreach(String str in newDependees)
             {
                 AddDependency(str, t);
+                size++;
             }
         }
     }
