@@ -109,7 +109,7 @@ namespace Dependencies
                 dependents = dictionary[s];
                 return dependents;
             }
-            catch (KeyNotFoundException e)
+            catch(KeyNotFoundException e)
             {
 
             }
@@ -205,8 +205,8 @@ namespace Dependencies
                 {
                     temp.Add(str);
                 }
-                size++;
                 dictionary.Add(s, temp);
+                size++;
             }
         }
 
@@ -230,7 +230,6 @@ namespace Dependencies
             foreach(String str in newDependees)
             {
                 AddDependency(str, t);
-                //change
                 size++;
             }
         }
