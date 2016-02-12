@@ -1,6 +1,7 @@
 ﻿// Skeleton implementation written by Joe Zachary for CS 3500, January 2015.
 // Revised for CS 3500 by Joe Zachary, January 29, 2016
 //Revised by Neal Phelps 2/4/2016 U0669056 for CS 3500
+//Updated by Neal Phelps on 2/11/2016
 
 using System;
 using System.Collections.Generic;
@@ -61,6 +62,22 @@ namespace Dependencies
             dictionary = new Dictionary<string, HashSet<string>>();
             size = 0;
         }
+        /// <summary>
+        /// Creates a dependency graph based on the given dependency graph argument
+        /// It will have the same dependencies and be identical, however they can be manipluated
+        /// indiviudally without effecting the other
+        /// </summary>
+        /// <param name="dg"></param>
+        public DependencyGraph(DependencyGraph dg)
+        {
+            Dictionary<string, HashSet<String>> d = dg.getDictionary();
+            dictionary = new Dictionary<string, HashSet<string>>();
+            foreach (KeyValuePair<string, HashSet<string>> pair in d)
+            {
+                dictionary.Add(pair.Key, pair.Value);
+            }
+            size = dg.Size;
+        }
 
         /// <summary>
         /// The number of dependencies in the DependencyGraph.
@@ -71,10 +88,15 @@ namespace Dependencies
         }
 
         /// <summary>
-        /// Reports whether dependents(s) is non-empty.  Requires s != null.
+        /// Reports whether dependents(s) is non-empty.
+        /// If s == null throws ArgumentNullException.
         /// </summary>
         public bool HasDependents(string s)
         {
+            if(s == null)
+            {
+                throw new ArgumentNullException();
+            }
             if (dictionary.ContainsKey(s))
             {
                 return true;
@@ -83,10 +105,14 @@ namespace Dependencies
         }
 
         /// <summary>
-        /// Reports whether dependees(s) is non-empty.  Requires s != null.
+        /// Reports whether dependees(s) is non-empty. If s == null throws ArgumentNullException.
         /// </summary>
         public bool HasDependees(string s)
         {
+            if (s == null)
+            {
+                throw new ArgumentNullException();
+            }
             foreach (HashSet<String> set in dictionary.Values)
             {
                 if (set.Contains(s))
@@ -98,10 +124,14 @@ namespace Dependencies
         }
 
         /// <summary>
-        /// Enumerates dependents(s).  Requires s != null.
+        /// Enumerates dependents(s).  If s == null throws ArgumentNullException.
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
+            if (s == null)
+            {
+                throw new ArgumentNullException();
+            }
             HashSet<String> dependents = new HashSet<string>();
             //CHANGE
             try
@@ -117,10 +147,14 @@ namespace Dependencies
         }
 
         /// <summary>
-        /// Enumerates dependees(s).  Requires s != null.
+        /// Enumerates dependees(s).  If s == null throws ArgumentNullException.
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
+            if (s == null)
+            {
+                throw new ArgumentNullException();
+            }
             List<String> list = new List<String>();
             //get keys
             foreach(KeyValuePair<String, HashSet<String>> p in dictionary)
@@ -136,10 +170,14 @@ namespace Dependencies
         /// <summary>
         /// Adds the dependency (s,t) to this DependencyGraph.
         /// This has no effect if (s,t) already belongs to this DependencyGraph.
-        /// Requires s != null and t != null.
+        /// If s or t == null throws ArgumentNullException.
         /// </summary>
         public void AddDependency(string s, string t)
         {
+            if (s == null || t == null)
+            {
+                throw new ArgumentNullException();
+            }
             if (dictionary.ContainsKey(s))
             {
                 var values = dictionary[s];
@@ -161,10 +199,14 @@ namespace Dependencies
         /// <summary>
         /// Removes the dependency (s,t) from this DependencyGraph.
         /// Does nothing if (s,t) doesn't belong to this DependencyGraph.
-        /// Requires s != null and t != null.
+        /// If s or t == null throws ArgumentNullException.
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
+            if (s == null || t == null)
+            {
+                throw new ArgumentNullException();
+            }
             if (dictionary.ContainsKey(s))
             {
                 var values = dictionary[s];
@@ -193,10 +235,14 @@ namespace Dependencies
         /// <summary>
         /// Removes all existing dependencies of the form (s,r).  Then, for each
         /// t in newDependents, adds the dependency (s,t).
-        /// Requires s != null and t != null.
+        /// If s or t == null throws ArgumentNullException.
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            if (s == null || newDependents == null)
+            {
+                throw new ArgumentNullException();
+            }
             HashSet<String> temp = new HashSet<string>(); ;
             if (dictionary.ContainsKey(s))
             {
@@ -213,10 +259,14 @@ namespace Dependencies
         /// <summary>
         /// Removes all existing dependencies of the form (r,t).  Then, for each 
         /// s in newDependees, adds the dependency (s,t).
-        /// Requires s != null and t != null.
+        /// If s or t == null throws ArgumentNullException.
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
+            if (t == null || newDependees == null)
+            {
+                throw new ArgumentNullException();
+            }
             //transfer newDependees to liest
             List<String> list = new List<string>();
             foreach(String str in dictionary.Keys)
@@ -232,6 +282,14 @@ namespace Dependencies
                 AddDependency(str, t);
                 size++;
             }
+        }
+        /// <summary>
+        /// return the dictionary
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<String, HashSet<String>> getDictionary()
+        {
+            return dictionary;
         }
     }
 }

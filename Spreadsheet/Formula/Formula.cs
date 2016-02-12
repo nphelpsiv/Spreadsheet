@@ -2,6 +2,7 @@
 // Revised by Joe Zachary, January 2016
 // JLZ Repaired pair of mistakes, January 23, 2016
 //Formula and Evaluate Methods completed and filled by Neal Phelps U0669056 CS 3500, Jan. 2016
+//Updated by Neal Phelps on 2/11/2016
 
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace Formulas
     /// the four binary operator symbols +, -, *, and /.  (The unary operators + and -
     /// are not allowed.)
     /// </summary>
-    public class Formula
+    public struct Formula
     {
         private IEnumerable<String> tokens;
         /// <summary>
@@ -41,45 +42,100 @@ namespace Formulas
         /// If the formula is syntacticaly invalid, throws a FormulaFormatException with an 
         /// explanatory Message.
         /// </summary>
-        public Formula(String formula)
+        public Formula(String formula) :this(formula, s => s, s => true)
         {
+        }
+
+        /// <summary>
+        /// Creates formula and checks for correct syntax which can then be evaluated, will throw expcetion if null. Parameters:
+        /// The purpose of a Normalizer is to convert variables into a canonical form.  The purpose of a Validator
+        /// is to impose extra restrictions on the validity of a variable, beyond the ones already built into the Formula definition.  
+        /// </summary>
+        /// <param name="formula"></param>
+        /// <param name="normalizer"></param>
+        /// <param name="validator"></param>
+        public Formula(String formula, Normalizer normalizer, Validator validator)
+        {
+            if(formula == null)
+            {
+                throw new FormulaFormatException("Formula must have at least one token");
+            }
             //set variables that should not be reset with each new token
             int count = 0;
             int countlp = 0;
             int countrp = 0;
+            String normVar;
+            List<string> list = new List<String>();
             bool isDorVARorRP = false;
             tokens = GetTokens(formula);
+            var iterate = tokens.GetEnumerator();
+            iterate.MoveNext();
             //Check if there is at least one token, and is not null
-            if (formula == null ||formula.Equals("") || tokens.Count() == 0)
+            if (formula.Equals(null) || formula.Equals("") || tokens.Count() == 0)
             {
                 throw new FormulaFormatException("Formula must have at least one token");
             }
             foreach (String token in tokens)
             {
+                string next;
                 //set and reset variables for each new token in tokens
+                if (iterate.MoveNext())
+                {
+                    next = iterate.Current;
+                }
+                else
+                {
+                    next = null;
+                }
                 bool isVar = false;
                 bool isOper = false;
                 bool islp = false;
                 bool isrp = false;
                 bool isDouble = false;
                 double n;
-                //Do checks to see what type the token is and set booleans accordingly
-                if (Regex.IsMatch(token, @"[a-zA-Z][0-9a-zA-Z]*"))
+                //Check if it's a double, if so store in n
+                if (Double.TryParse(token, out n))
                 {
                     if (isDorVARorRP == true)
                     {
                         throw new FormulaFormatException("Any token that immediately follows a number, a variable, or a closing parenthesis must be either an operator or a closing parenthesis.");
                     }
-                    isVar = true;
+                    list.Add(token);
+                    isDouble = true;
                     isDorVARorRP = true;
                     count++;
                 }
+                //Do checks to see what type the token is and set booleans accordingly
+                else if (Regex.IsMatch(token, @"[a-zA-Z][0-9a-zA-Z]*"))
+                {
+                    normVar = normalizer(token);
+                    if (Regex.IsMatch(normVar, @"[a-zA-Z][0-9a-zA-Z]*")){
+                        if (isDorVARorRP == true)
+                        {
+                            throw new FormulaFormatException("Any token that immediately follows a number, a variable, or a closing parenthesis must be either an operator or a closing parenthesis.");
+                        }
+                        //TODO replace token with normNVar
+                        list.Add(normVar);
+                        isVar = true;
+                        isDorVARorRP = true;
+                        count++;
+                    }
+                    else
+                    {
+                        throw new FormulaFormatException("Normalized variable is not legal");
+                    }
+                    if (validator(normVar) == false)
+                    {
+                        throw new FormulaFormatException("Validiator says this is not valid");
+                    }
+                }
                 else if (Regex.IsMatch(token, @"[\+\-*/]"))
                 {
-                    if (isDorVARorRP == false)
+                    if (next == null || isDorVARorRP == false)
                     {
                         throw new FormulaFormatException("Any token that immediately follows an opening parenthesis or an operator must be either a number, a variable, or an opening parenthesis.");
                     }
+                    list.Add(token);
                     isOper = true;
                     isDorVARorRP = false;
                     count++;
@@ -90,6 +146,7 @@ namespace Formulas
                     {
                         throw new FormulaFormatException("Any token that immediately follows a number, a variable, or a closing parenthesis must be either an operator or a closing parenthesis.");
                     }
+                    list.Add(token);
                     islp = true;
                     isDorVARorRP = false;
                     count++;
@@ -101,26 +158,16 @@ namespace Formulas
                     {
                         throw new FormulaFormatException("Any token that immediately follows an opening parenthesis or an operator must be either a number, a variable, or an opening parenthesis.");
                     }
+                    list.Add(token);
                     isrp = true;
                     isDorVARorRP = true;
                     count++;
                     countrp++;
                     //Check if we have too many right parenthesis
-                    if(countrp > countlp)
+                    if (countrp > countlp)
                     {
                         throw new FormulaFormatException("Too many close paranthesis");
                     }
-                }
-                //Check if it's a double, if so store in n
-                else if (Double.TryParse(token, out n))
-                {
-                    if (isDorVARorRP == true)
-                    {
-                        throw new FormulaFormatException("Any token that immediately follows a number, a variable, or a closing parenthesis must be either an operator or a closing parenthesis.");
-                    }
-                    isDouble = true;
-                    isDorVARorRP = true;
-                    count++;
                 }
                 //If its not one of the valid types throw the exception
                 else
@@ -128,7 +175,7 @@ namespace Formulas
                     throw new FormulaFormatException("There is a character that is not valid");
                 }
                 //Check if first variable is valid
-                if(count == 0 && !(islp || isDouble || isVar))
+                if (count == 0 && !(islp || isDouble || isVar))
                 {
                     throw new FormulaFormatException("The first token of a formula must be a number, a variable, or an opening parenthesis.");
                 }
@@ -140,12 +187,13 @@ namespace Formulas
                         throw new FormulaFormatException("The last token of a formula must be a number, a variable, or a closing parenthesis.");
                     }
                     //Check if paranthesis are equal at end
-                    if(countlp != countrp)
+                    if (countlp != countrp)
                     {
                         throw new FormulaFormatException("The total number of opening parentheses must equal the total number of closing parentheses.");
                     }
                 }
             }
+            tokens = list;
         }
         /// <summary>
         /// Evaluates this Formula, using the Lookup delegate to determine the values of variables.  (The
@@ -158,6 +206,10 @@ namespace Formulas
         /// </summary>
         public double Evaluate(Lookup lookup)
         {
+            if(tokens == null)
+            {
+                return 0;
+            }
             //Create stacks and final result
             Stack<String> strStack = new Stack<String>();
             Stack<Double> dStack = new Stack<Double>();
@@ -172,7 +224,12 @@ namespace Formulas
                 bool isDouble = false;
                 double d = 0;
                 //make checks to see what type the token is
-                if (Regex.IsMatch(token, @"[a-zA-Z][0-9a-zA-Z]*"))
+                //Check if it is a double, if so store in d
+                if (Double.TryParse(token, out d))
+                {
+                    isDouble = true;
+                }
+                else if (Regex.IsMatch(token, @"[a-zA-Z][0-9a-zA-Z]*"))
                 {
                     isVar = true;
 
@@ -190,11 +247,6 @@ namespace Formulas
                 else if (Regex.IsMatch(token, @"^[)]+$"))
                 {
                     isrp = true;
-                }
-                //Check if it is a double, if so store in d
-                else if (Double.TryParse(token, out d))
-                {
-                    isDouble = true;
                 }
                 //if it is a variable call lookup method to see if it correlates to value, store in that double value, otherwise throw exception
                 if (isVar)
@@ -384,6 +436,39 @@ namespace Formulas
                 }
             }
         }
+        /// <summary>
+        /// Gets all tokens that are variables
+        /// </summary>
+        /// <returns></returns>
+        public ISet<string> GetVariables()
+        {
+            ISet<string> set = new HashSet<string>();
+            foreach(String token in tokens)
+            {
+                if (Regex.IsMatch(token, @"[a-zA-Z][0-9a-zA-Z]*"))
+                {
+                    set.Add(token);
+                }
+            }
+            return set;
+        }
+        /// <summary>
+        /// Gives this Formula in string form without whitespaces
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            if(tokens == null)
+            {
+                return "0";
+            }
+            string result = "";
+            foreach(String token in tokens)
+            {
+                result += token;
+            }
+            return result;
+        }
     }
 
     /// <summary>
@@ -394,6 +479,21 @@ namespace Formulas
     /// don't is up to the implementation of the method.
     /// </summary>
     public delegate double Lookup(string s);
+
+    /// <summary>
+    /// Converts variables into a canonical form
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns></returns>
+    public delegate string Normalizer(string s);
+
+    /// <summary>
+    /// Imposes estra restrictions on the validity of a variable, 
+    /// beyond the ones int he formula constructor
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns></returns>
+    public delegate bool Validator(string s);
 
     /// <summary>
     /// Used to report that a Lookup delegate is unable to determine the value
@@ -436,5 +536,9 @@ namespace Formulas
         public FormulaEvaluationException(String message) : base(message)
         {
         }
-    }
+    }/// <summary>
+     /// Add a zero-parameter method GetVariables() to the Formula class.  
+     /// It should return an ISet<string> that contains each distinct variable (in normalized form) that appears in the Formula.
+     /// </summary>
+
 }

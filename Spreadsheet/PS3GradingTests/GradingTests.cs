@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Added Test by Neal Phelps on 2/11/2016
+//All un commented test were by Joe Zachery
+
+using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Dependencies;
@@ -16,6 +19,93 @@ namespace GradingTests
         [TestClass()]
         public class DependencyGraphTest
         {
+            /// <summary>
+            /// Test the new constructer
+            /// </summary>
+            [TestMethod()]
+            public void NewConstructerTest()
+            {
+                DependencyGraph d = new DependencyGraph();
+                d.AddDependency("a", "b");
+                d.AddDependency("a", "c");
+                d.AddDependency("b", "d");
+                d.AddDependency("d", "d");
+                DependencyGraph d2 = new DependencyGraph(d);
+                Assert.IsTrue(d2.HasDependees("b"));
+                Assert.IsFalse(d2.HasDependees("z"));
+                Assert.IsTrue(d2.HasDependents("b"));
+                Assert.AreEqual(d.Size, d2.Size);
+                d2.RemoveDependency("b", "d");
+                Assert.AreNotEqual(d.Size, d2.Size);
+                d.RemoveDependency("a", "b");
+                Assert.AreEqual(d.Size, d2.Size);
+                d2.AddDependency("e", "f");
+                Assert.AreNotEqual(d.Size, d2.Size);
+                d.AddDependency("g", "k");
+                Assert.AreEqual(d.Size, d2.Size);
+            }
+            [TestMethod()]
+            [ExpectedException(typeof(ArgumentNullException))]
+            public void NullsTest()
+            {
+                DependencyGraph d = new DependencyGraph();
+                d.AddDependency(null, null);
+                d.RemoveDependency(null, null);
+                
+            }
+            [TestMethod()]
+            [ExpectedException(typeof(ArgumentNullException))]
+            public void NullsTest2()
+            {
+                DependencyGraph d = new DependencyGraph();
+                d.RemoveDependency(null, null);
+
+            }
+            [TestMethod()]
+            [ExpectedException(typeof(ArgumentNullException))]
+            public void NullsTest3()
+            {
+                DependencyGraph d = new DependencyGraph();
+                d.ReplaceDependees(null, null);
+
+            }
+            [TestMethod()]
+            [ExpectedException(typeof(ArgumentNullException))]
+            public void NullsTest4()
+            {
+                DependencyGraph d = new DependencyGraph();
+                d.HasDependees(null);
+
+            }
+            [TestMethod()]
+            [ExpectedException(typeof(ArgumentNullException))]
+            public void NullsTest5()
+            {
+                DependencyGraph d = new DependencyGraph();
+                d.HasDependents(null);
+
+            }
+            [TestMethod()]
+            [ExpectedException(typeof(ArgumentNullException))]
+            public void NullsTest6()
+            {
+                DependencyGraph d = new DependencyGraph();
+                d.GetDependees(null);
+
+            }
+            [TestMethod()]
+            [ExpectedException(typeof(ArgumentNullException))]
+            public void NullsTest7()
+            {
+                DependencyGraph d = new DependencyGraph();
+                d.GetDependents(null);
+            }
+            public void NullsTest8()
+            {
+                DependencyGraph d = new DependencyGraph();
+                d.ReplaceDependents(null, null);
+
+            }
             // ************************** TESTS ON EMPTY DGs ************************* //
 
             /// <summary>

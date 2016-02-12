@@ -1,4 +1,7 @@
-﻿using System;
+﻿//Added Tests by Neal Phelps on 2/11/2016
+//Note for some reason the curly bracket is showing as untested and significantly lowering my test coverage
+
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Formulas
