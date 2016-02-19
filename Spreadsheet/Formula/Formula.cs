@@ -87,8 +87,8 @@ namespace Formulas
                 {
                     next = null;
                 }
-                bool isVar = false;
                 bool isOper = false;
+                bool isVar = false;
                 bool islp = false;
                 bool isrp = false;
                 bool isDouble = false;
@@ -256,7 +256,7 @@ namespace Formulas
                         d = lookup(token);
                         isDouble = true;
                     }
-                    catch(UndefinedVariableException e)
+                    catch(UndefinedVariableException)
                     {
                         throw new FormulaEvaluationException(token + " is not a defined variable.");
                     }

@@ -139,9 +139,9 @@ namespace Dependencies
                 dependents = dictionary[s];
                 return dependents;
             }
-            catch(KeyNotFoundException e)
+            catch(KeyNotFoundException)
             {
-
+                
             }
             return dependents;
         }
