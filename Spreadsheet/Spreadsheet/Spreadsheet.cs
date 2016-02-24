@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Formulas;
 using Dependencies;
 using System.Text.RegularExpressions;
+using System.IO;
 
 namespace SS
 {
@@ -18,6 +19,19 @@ namespace SS
     {
         DependencyGraph dp;
         Dictionary<String, Cell> spreadsheet;
+
+        public override bool Changed
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            protected set
+            {
+                throw new NotImplementedException();
+            }
+        }
 
 
         /// <summary>
@@ -104,7 +118,7 @@ namespace SS
             HashSet<string> list = new HashSet<string>();
             foreach(KeyValuePair<string, Cell> cell in spreadsheet)
             {
-                if (cell.Value.IsCellEmpty())
+                if (!cell.Value.IsCellEmpty())
                 {
                     list.Add(cell.Key);
                 }
@@ -127,7 +141,7 @@ namespace SS
         /// For example, if name is A1, B1 contains A1*2, and C1 contains B1+A1, the
         /// set {A1, B1, C1} is returned.
         /// </summary>
-        public override ISet<string> SetCellContents(string name, Formula formula)
+        protected override ISet<string> SetCellContents(string name, Formula formula)
         {
             Cell cell = new Cell();
             if (name == null)
@@ -174,7 +188,7 @@ namespace SS
         /// For example, if name is A1, B1 contains A1*2, and C1 contains B1+A1, the
         /// set {A1, B1, C1} is returned.
         /// </summary>
-        public override ISet<string> SetCellContents(string name, string text)
+        protected override ISet<string> SetCellContents(string name, string text)
         {
             Cell cell = new Cell();
             if(text == null)
@@ -214,7 +228,7 @@ namespace SS
         /// For example, if name is A1, B1 contains A1*2, and C1 contains B1+A1, the
         /// set {A1, B1, C1} is returned.
         /// </summary>
-        public override ISet<string> SetCellContents(string name, double number)
+        protected override ISet<string> SetCellContents(string name, double number)
         {
             Cell cell = new Cell();
             if (name == null)
@@ -303,7 +317,26 @@ namespace SS
                 }
      
             }
+            if(hitDigit == false)
+            {
+                return true;
+            }
             return false;
+        }
+
+        public override void Save(TextWriter dest)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override object GetCellValue(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ISet<string> SetContentsOfCell(string name, string content)
+        {
+            throw new NotImplementedException();
         }
     }
 }

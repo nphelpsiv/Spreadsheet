@@ -152,20 +152,5 @@ namespace SS
             Assert.IsTrue(set.Contains("D1"));
             Assert.IsFalse(set.Contains("Z2"));
         }
-        [TestMethod()]
-        public void TestForEmptyCells()
-        {
-            AbstractSpreadsheet ss = new Spreadsheet();
-            ss.SetCellContents("a1", 2);
-            ss.SetCellContents("b1", new Formula("a1*2"));
-            ss.SetCellContents("c1", "");
-            ss.SetCellContents("d1", new Formula("b1+c1"));
-            ss.SetCellContents("z2", "");
-            HashSet<string> set = (HashSet<string>) ss.GetNamesOfAllNonemptyCells();
-            HashSet<string> testList = new HashSet<string>();
-            testList.Add("Z2");
-            testList.Add("C1");
-            Assert.IsTrue(testList.SetEquals(set));
-        }
     }
 }
