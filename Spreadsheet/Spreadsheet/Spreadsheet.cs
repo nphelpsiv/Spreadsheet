@@ -152,10 +152,10 @@ namespace SS
                                 {
                                     throw new SpreadsheetReadException("");
                                 }
-                                catch (KeyNotFoundException)
-                                {
-                                    throw new SpreadsheetReadException("");
-                                }
+                                //catch (keynotfoundexception)
+                                //{
+                                //    throw new spreadsheetreadexception("");
+                                //}
 
 
                                 break;
@@ -528,7 +528,8 @@ namespace SS
             }
             HashSet<String> set = new HashSet<string>();
             double d = 0;
-            if(name == null)
+            //Change
+            if (name == null || !(isValid.IsMatch(name.ToUpper())))
             {
                 throw new InvalidNameException();
             }
@@ -571,9 +572,10 @@ namespace SS
         {
             foreach (String s in set)
             {
-                if (spreadsheet[s].GetValue().GetType().Equals(typeof(Formula)))
+                //CHANGE
+                if (spreadsheet[s].GetContents().GetType().Equals(typeof(Formula)))
                 {
-                    Formula f = (Formula)spreadsheet[s].GetValue();
+                    Formula f = (Formula)spreadsheet[s].GetContents();
                     try
                     {
                         spreadsheet[s].SetValue(f.Evaluate(GetDoubleValue));
@@ -601,9 +603,25 @@ namespace SS
         private double GetDoubleValue(String name)
         {
             double d = 0;
-            name = spreadsheet[name].GetValue().ToString();
-            Double.TryParse(name, out d);
-            return d;
+            //Change
+            try
+            {
+                name = spreadsheet[name].GetValue().ToString();
+
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new FormulaEvaluationException("Key or name doesnt exist");
+            }
+            
+            if(Double.TryParse(name, out d))
+            {
+                return d;
+            }
+            else
+            {
+                throw new FormulaEvaluationException("Key or name doesnt exist");
+            }
 
         }
     }
