@@ -571,9 +571,10 @@ namespace SS
         {
             foreach (String s in set)
             {
-                if (spreadsheet[s].GetValue().GetType().Equals(typeof(Formula)))
+                //Change
+                if (spreadsheet[s].GetContents().GetType().Equals(typeof(Formula)))
                 {
-                    Formula f = (Formula)spreadsheet[s].GetValue();
+                    Formula f = (Formula)spreadsheet[s].GetContents();
                     try
                     {
                         spreadsheet[s].SetValue(f.Evaluate(GetDoubleValue));
