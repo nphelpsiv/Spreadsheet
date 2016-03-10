@@ -1,0 +1,12 @@
+﻿Hey Boya thank you for doing the regrade. Notice I made 3 simple changes to pass all but a few test cases.
+The changes have been commented which you can find by searching for "//Change".
+For the first change I simpy had to add another conditional to
+check now only if name was null but also it was valid. Ffor the second change I had to
+get the spreadsheet contents in this case rather than values "spreadsheet[s].GetContents().GetType().Equals(typeof(Formula))".
+For my third change I added a try catch to a catch if the key, or name wasn't found. This
+exception was being thrown because of my implementation on one dictionary rather than two
+I also added a if else conditional to my tryparse to make sure I was gettting a double.
+Thank you for the regrade, hopefully you can find all the changes. If you have any questions just let me know. 
+Also for the changes Future issues can be avoided
+by adding more test cases on my end, especially corner cases. Thank you for regrading this
+project. 
