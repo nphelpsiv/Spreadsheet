@@ -602,9 +602,24 @@ namespace SS
         private double GetDoubleValue(String name)
         {
             double d = 0;
-            name = spreadsheet[name].GetValue().ToString();
-            Double.TryParse(name, out d);
-            return d;
+            try
+            {
+                name = spreadsheet[name].GetValue().ToString();
+
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new FormulaEvaluationException("Key or name doesnt exist");
+            }
+
+            if (Double.TryParse(name, out d))
+            {
+                return d;
+            }
+            else
+            {
+                throw new FormulaEvaluationException("Key or name doesnt exist");
+            }
 
         }
     }
