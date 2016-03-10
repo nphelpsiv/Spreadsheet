@@ -528,7 +528,7 @@ namespace SS
             }
             HashSet<String> set = new HashSet<string>();
             double d = 0;
-            if(name == null)
+            if (name == null || !(isValid.IsMatch(name.ToUpper())))
             {
                 throw new InvalidNameException();
             }
