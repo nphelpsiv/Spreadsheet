@@ -13,9 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PS2GradingTests", "PS2Gradi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PS3GradingTests", "PS3GradingTests\PS3GradingTests.csproj", "{0BB0FEFF-986E-496F-9939-8A52E52E083F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spreadsheet", "..\..\..\..\..\..\Users\Neal\Source\Repos\spreadsheet\Spreadsheet\Spreadsheet\Spreadsheet.csproj", "{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spreadsheet", "Spreadsheet\Spreadsheet.csproj", "{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PS4GradingTests", "..\..\..\..\..\..\Users\Neal\Source\Repos\spreadsheet\Spreadsheet\PS4GradingTests\PS4GradingTests.csproj", "{BAF269F6-6B3D-4319-AAD5-B163DE642AE2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PS4GradingTests", "PS4GradingTests\PS4GradingTests.csproj", "{BAF269F6-6B3D-4319-AAD5-B163DE642AE2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetTests", "UnitTestProject1\SpreadsheetTests.csproj", "{654E7709-DDB1-4058-9924-27135079ED32}"
 EndProject
